@@ -24,4 +24,4 @@ COPY . /code/
 EXPOSE 8000
 
 # Run migrations and start Gunicorn bound to port 8000
-CMD ["sh", "-c", "python /code/src/manage.py migrate && gunicorn --bind 0.0.0.0:8000 CFEhome.wsgi:application"]
+CMD ["sh", "-c", "python /code/src/manage.py migrate && gunicorn --chdir /code/src --bind 0.0.0.0:8000 CFEhome.wsgi:application"]
