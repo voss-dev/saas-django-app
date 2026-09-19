@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block head_title %} Homepage - {{ block.super }}{% endblock %}
+
+{% block content %}
+    {% include 'snippet/welcome_user_msg.html' %}
+    <h1>Welcome to the SaaS homepage!</h1>
+    <p>Page visit for this path ({{request.path}}):{{ page_visit_count }}</p>
+    <p>Total visits across entire site: {{ total_visit_count }}</p>
+    <p>Path Traffic Percantage: {{ percent }}%</p>
+
+{% endblock %}

@@ -1,0 +1,6 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilepath = "Dockerfile"
+
+[deploy]
+watchPatterns = ["src/**", "requirements.txt", "Dockerfile"]

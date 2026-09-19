@@ -1,0 +1,7 @@
+<div>
+    {% if request.user.is_authenticated %}
+    <p>You are a user</p>
+    {% else %}
+    <p>You are not a user</p>
+    {% endif %}
+</div>
