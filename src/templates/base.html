@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block head_title %}My Site{% endblock %}</title>
+    <title>{% block head_title %}SaaS App{% endblock %}</title>
+    {% include 'base/css.html' %}
 </head>
 <body>
+    {% include 'nav/navbar.html' %}
+    {% include 'base/messages.html' %}
     {% block content %}
     <!-- Default content or placeholders go here -->
     {% endblock %}
+
+    {% include 'base/js.html' %}
 </body>
 </html>

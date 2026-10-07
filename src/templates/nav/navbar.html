@@ -1,0 +1,14 @@
+<nav class="flex justify-between p-4 bg-gray-100">
+    <a href="{% url 'home' %}" class="font-bold">SaaS App</a> <!--Django url reversing tag-->
+
+    <div>
+        {% if request.user.is_authenticated %} <!--Checks whether the current user is logged in-->
+            <span class="mr-4">Welcome, {{ request.user.username }}</span> <!--Displays the logged-in user's username-->
+            <a href="{% url 'account_logout' %}" class="text-red-600">Log Out</a><!--Creates a logout link using the URL named account_logout, provided  dy django-allauth -->
+        {% else %}
+            <!-- Creats login and signup links from allauth's named URLs -->
+            <a href="{% url 'account_login' %}" class="mr-4">Log In</a>
+            <a href="{% url 'account_signup' %}" class="bg-blue-600 text-white px-3 py-1 rounded">Sign Up</a>
+        {% endif %}
+    </div>
+</nav>

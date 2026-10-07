@@ -9,8 +9,19 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
-
+import os
+import dj_database_url
 from pathlib import Path
+from decouple import config
+
+# Cast "True"/"1" to a Python boolean
+DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
+
+# If DJANGO_SECRET_KEY is missing, decauple raises an UndefinedValueError
+SECRET_KEY = config("DJANGO_SECRET_KEY")
+
+STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", default=None)
+STRIPE_PUB_KEY = config("STRIPE_PUB_KEY", default=None)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,11 +30,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-01n2^1mbu3)8*_hp%#q685%24ucvnp%%0)x-ifm9(6!^x*4+as'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = [
     ".railway.app",
@@ -31,30 +37,73 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
+# django-allauth 
+# Tells Django how to check credentials
+AUTHENTICATION_BACKENDS = [ 
+    'django.contrib.auth.backends.ModelBackend',  #default username/password
+    'allauth.account.auth_backends.AuthenticationBackend', 
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'VERIFIED_EMAIL': True
+    }
+}
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.admin', # Admin panel interface
+    'django.contrib.auth', # User authentication & permissions
+    'django.contrib.contenttypes', # Content type system
+    'django.contrib.sessions', # Session management
+    'django.contrib.messages', # Flash messaging
+    'django.contrib.staticfiles', #Static file management
+    'django.contrib.sites',
 
     # Custom Apps
     'visits',
+    'Commando',
+    'off',
+
+    # django-allauth-ui
+    'allauth_ui',
+    
+    # django-allauth
+    # (Built-in Allauth Apps), registers allauth's apps so Django finds their models, templates, and views
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    'widget_tweaks',
+    'slippers',
+    'subscriptions',
+    'customers',
+    'checkouts',
 ]
+
+SITE_ID = 1
+ALLAUTH_UI_THEME = "light"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware', #django-allauth
 ]
+
+# Allauth Behavior Settings
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password1*"]
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory' # Forces users to verify email before logging in
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 ROOT_URLCONF = 'CFEhome.urls'
 
@@ -74,17 +123,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'CFEhome.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation
@@ -123,12 +161,59 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static_files',
+]
+
+STATIC_ROOT = BASE_DIR.parent / 'local_cdn'
+
+# Django 4.2+ Storage Engine format
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "CFEhome.storage.CustomStaticFilesStorage",
+    },
+}
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+        'OPTIONS': {
+            'host': config("EMAIL_HOST", default="smtp.gmail.com"),
+            'port': config("EMAIL_PORT", default=587, cast=int),
+            'username': config('EMAIL_HOST_USER', default=""),
+            'password': config('EMAIL_HOST_PASSWORD', default=""),
+            'use_tls': config("EMAIL_USE_TLS", default=True, cast=bool),
+        },
     },
 }
+
+
+# Optional Admin alert recipients
+ADMINS = [("Admin", "felix.mengesa.dev@gmail.com")]
+MANAGERS = ADMINS
+
+DATABASE_URL = config("DATABASE_URL", default=None)
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=0,
+            conn_health_checks=True, #Verifies active connections
+        )
+    }
+    DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
+else:
+    # Fallback to SQLite if DATABASE_URL is not set
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }

@@ -1,0 +1,7 @@
+{% if messages %} <!--if template in django framework-->
+    {% for message in messages %}
+        <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50">
+            {{ message }}
+        </div>
+    {% endfor %} <!-- for ending the  for  loop block-->
+{% endif %} <!--used to close a conditional  block-->

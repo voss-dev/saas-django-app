@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Staff-Only Area</h1>
+    <p>Hello, {{ request.user.username }}. You have staff access.</p>
+{% endblock %}
