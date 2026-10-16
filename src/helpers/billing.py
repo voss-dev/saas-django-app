@@ -48,9 +48,7 @@ def create_checkout_session(customer_id, price_id, success_url, cancel_url, raw=
     # If raw remains False, it returns only  the hosted checkout page URL which you can use to redirect the customer
     return response.url
 
-# Small wrappers around Stripe's API.They allow the rest of your Django code to say:
-# session = get_checkout_session(session_id)
-# subscription = get_subscription(subscription_id)
+
 def get_checkout_session(session_id):
     return stripe.checkout.Session.retrieve(session_id)
 
