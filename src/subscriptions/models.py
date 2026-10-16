@@ -1,6 +1,7 @@
 # Creating classes that create the model definitions
 # make migrations and migrate create or change the actual database tables
-
+from datetime import timedelta
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import Group, Permission
 from django.conf import settings
@@ -40,6 +41,40 @@ class Subscription(models.Model):
     def __str__(self):
         return self.name
 
+
+class UserSubscriptionQuerySet(models.QuerySet):
+    def active(self):
+        """Filters for subscriptions flagged as active"""
+        return self.filter(active=True)
+    
+    def by_range(self, days_start=0, days_end=30):
+        """
+        Filters subscription expiring between days_start and days_end from today
+        Expands the window to start at 00:00:00 and end at 23:59:59.
+        """
+
+        now = timezone.now()
+        start_date = (now + timedelta(days=days_start)).replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = (now + timedelta(days=days_end)).replace(hour=23, minute=59, second=59, microsecond=999999)
+
+        return self.filter(
+            current_period_end__gte=start_date,
+            current_period_end__lte=end_date,
+        )
+
+    def by_days_left(self, days=0):
+        """Filters subscriptions expiring exactly within a specific number of days."""
+        return self.by_range(days_start=0, days_end=days)
+
+class UserSubscriptionManager(models.Manager):
+    def get_queryset(self):
+        return UserSubscriptionQuerySet(self.model, using=self._db,)
+    
+    def active(self):
+        return self.get_queryset().active()
+
+    def by_range(self, days_start=0, days_end=30):
+        return self.get_queryset().by_range(days_start=days_start, days_end=days_end)
     
 class UserSubscription(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE) #Links one user to one subscription model, user deleted the subscription record deleted
@@ -55,6 +90,9 @@ class UserSubscription(models.Model):
     current_period_start = models.DateTimeField(null=True, blank=True)
     current_period_end = models.DateTimeField(null=True, blank=True)
 
+    # Attach the custom manager
+    objects = UserSubscriptionManager()
+    
     def __str__(self):
         return f"{self.user.username} - {self.subscription}"
 

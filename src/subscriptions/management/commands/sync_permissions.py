@@ -11,7 +11,7 @@ class Command(BaseCommand): #defines the custom command
         for sub in subscriptions: #processes each active subscription
             sub_perms = sub.permissions.all() #gets that subscription's permissions
             for group in sub.groups.all():
-                # Assign subscription permissions to the connected group
+                # Assign subscription permissions to the cobnnected group
                 group.permissions.set(sub_perms)
 
         self.stdout.write(self.style.SUCCESS("Successfully synced all subcsription permissions."))

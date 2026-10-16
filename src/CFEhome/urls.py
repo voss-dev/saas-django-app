@@ -20,6 +20,7 @@ from .views import home_view, about_view, user_only_view, staff_only_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("checkout/", include("checkouts.urls")),
     path('accounts/', include('allauth.urls')), #Includes login, signup, password reset, etc.
     path('', home_view, name='home'),
     path('about/', about_view),
