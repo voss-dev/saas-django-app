@@ -3,12 +3,10 @@
 import stripe
 from django.conf import settings
 
-def _init_stripe():
-    # Initialize the global API key
-    stripe.api_key = settings.STRIPE_SECRET_KEY
+# Initialize the global API key
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def create_stripe_customer(email=None, metadata=None, raw=False):
-    _init_stripe()
     """Creates a Customer in Stripe and returns the APi response."""
     response = stripe.Customer.create(
         email=email,
@@ -21,7 +19,6 @@ def create_stripe_customer(email=None, metadata=None, raw=False):
     return response.id
 
 def create_checkout_session(customer_id, price_id, success_url, cancel_url, raw=False):
-    _init_stripe()
     """Creates a Hosted Checkout Session for recurring subscriptions."""
 
     # Creates a Stripe Checkout Session which:
@@ -34,7 +31,10 @@ def create_checkout_session(customer_id, price_id, success_url, cancel_url, raw=
     response = stripe.checkout.Session.create(
         customer=customer_id,
         payment_method_types=['card'],
-        line_items=[{'price': price_id,'quantity': 1}],
+        line_items=[{
+            'price': price_id,
+            'quantity': 1.
+        }],
         mode='subscription',
         success_url=success_url,
         cancel_url=cancel_url,
@@ -52,9 +52,7 @@ def create_checkout_session(customer_id, price_id, success_url, cancel_url, raw=
 # session = get_checkout_session(session_id)
 # subscription = get_subscription(subscription_id)
 def get_checkout_session(session_id):
-    _init_stripe()
     return stripe.checkout.Session.retrieve(session_id)
 
 def get_subscription(subscription_id):
-    _init_stripe()
     return stripe.Subscription.retrieve(subscription_id)
