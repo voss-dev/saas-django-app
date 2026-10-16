@@ -1,0 +1,48 @@
+# Name shown in the GitHib Actions page
+name: Scheduled Production Worker
+
+# When this workflow should run
+on:
+  schedule:
+    - cron: '0 1,13 * * *' # Runs at 01:00 and 13:00 UTC every day(twice daily)
+
+  # Allows manual "Run workflow" from GitHub Actions 
+  workflow_dispatch:
+
+# Tasks GitHub will perform
+jobs:
+  sync-subscriptions:
+    # Temporary Ubuntu computer provided by GitHub
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download this repository's code onto the runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Install Python 3.12 and cache pip packages
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      # Install packages listed in requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Run the Django command that syncs subscriptions with Stripe
+      - name: Run Subscription Sync
+        env:
+          # Secret values come from GitHub repository secrets
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_DEBUG: 0
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+
+        # Check subscriptions ending within the next 3 days
+        run: |
+          cd src
+          python manage.py sync_user_subs --days-left 3
