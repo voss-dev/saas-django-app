@@ -37,6 +37,11 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
+# Railway terminates HTTPS at its proxy
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+CSRF_TRUSTED_ORIGINS = ["https://*.railway.app",]
+
 # django-allauth 
 # Tells Django how to check credentials
 AUTHENTICATION_BACKENDS = [ 

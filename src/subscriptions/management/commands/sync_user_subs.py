@@ -23,24 +23,25 @@ class Command(BaseCommand):
         if days_left > 0:
             qs = qs.by_days_left(days=days_left)
 
-            self.stdout.write(f"Checking {qs.count()} subscription records against Stripe...")
+        self.stdout.write(f"Checking {qs.count()} subscription records against Stripe...")
 
-            # qs = [Alice, Brian, David]
-            for user_sub in qs:
-                try:
-                    # 2. Query the Stripe API for current status
-                    sub_data = get_subscription(user_sub.stripe_id)
-                    status = sub_data.status
+        # qs = [Alice, Brian, David]
+        for user_sub in qs:
+            try:
+                # 2. Query the Stripe API for current status
+                sub_data = get_subscription(user_sub.stripe_id)
+                status = sub_data.status
 
-                    subscription_item = sub_data["items"]["data"][0]
-                    # 3.Update period timestamps
-                    current_period_start = datetime.datetime.fromtimestamp(subscription_item["current_period_start"], tz=datetime.timezone.utc)
-                    current_period_end = datetime.datetime.fromtimestamp(subscription_item["current_period_end"], tz=datetime.timezone.utc)
+                subscription_item = sub_data["items"]["data"][0]
+                # 3.Update period timestamps
+                current_period_start = datetime.datetime.fromtimestamp(subscription_item["current_period_start"], tz=datetime.timezone.utc)
+                current_period_end = datetime.datetime.fromtimestamp(subscription_item["current_period_end"], tz=datetime.timezone.utc)
 
-                    user_sub.current_period_start = current_period_start
-                    user_sub.current_period_end = current_period_end
-                    user_sub.active = status == "active"
+                user_sub.current_period_start = current_period_start
+                user_sub.current_period_end = current_period_end
+                user_sub.active = status == "active"
+                # user_sub.save(update_fields=["current_period_start", "current_period_end", "active"])
 
-                    self.stdout.write(self.style.SUCCESS(f"Synced {user_sub.user.username}: status={status}"))
-                except Exception as e:
-                    self.stdout.write(self.style.ERROR(f"Error syncing {user_sub.user.username}: {e}"))
+                self.stdout.write(self.style.SUCCESS(f"Synced {user_sub.user.username}: status={status}"))
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"Error syncing {user_sub.user.username}: {e}"))
