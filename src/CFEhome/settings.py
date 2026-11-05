@@ -32,7 +32,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 ALLOWED_HOSTS = [
-    ".railway.app",
+    "saas-django-app.onrender.com",
     "127.0.0.1",
     "localhost",
 ]
@@ -40,7 +40,7 @@ ALLOWED_HOSTS = [
 # Railway terminates HTTPS at its proxy
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-CSRF_TRUSTED_ORIGINS = ["https://*.railway.app",]
+CSRF_TRUSTED_ORIGINS = ["https://*.onrender.com"]
 
 # django-allauth 
 # Tells Django how to check credentials
