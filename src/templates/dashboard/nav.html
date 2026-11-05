@@ -1,0 +1,22 @@
+<nav class="bg-white border-b border-gray-200 px-4 py-3 dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex flex-wrap items-center justify-between">
+        <div class="flex items-center">
+            <a href="{% url 'home' %}" class="text-xl font-bold text-gray-900 dark:text-white">SaaS Dashboard</a>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-gray-700 dark:text-gray-300"> 
+                User: {{ request.user.username }}
+            </span>
+            <a href="#" class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                {% if subscription %}
+                    {{ subscription.name }}
+                {% else %}
+                    Free Plan
+                {% endif %}
+            </a>
+
+            <a href="{% url 'account_logout' %}" class="text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Log Out</a>
+        </div>
+    </div>
+</nav>

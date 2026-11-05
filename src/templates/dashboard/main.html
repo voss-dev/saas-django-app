@@ -1,0 +1,67 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+<div class="grid gap-4 md:grid-cols-3">
+    <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
+        <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+            Current Subscription
+        </h3>
+
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">
+            {% if subscription %}
+                {{ subscription.name }}
+            {% else %}
+            No Active Subscription
+            {% endif %}
+        </p>
+
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+            Status: {{ user_sub.status|default:"Inactive"|title }}
+        </span>
+    </div>
+
+    <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
+        <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+            Renewal Countdown
+        </h3>
+
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">
+        {% if user_sub.current_period_end %}
+            {{ user_sub.current_period_end|timeuntil }} remaining
+        {% else %}
+            N/A
+        {% endif %}
+        </p>
+
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+        Billing Period End
+        </span>
+    </div>
+
+    <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
+        <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+        Active Permissions
+    </h3>
+
+        <div class="flex flex-wrap gap-2">
+        {% if perms.subscriptions.basic_perm %}
+            <span class="px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+            Basic Access
+            </span>
+        {% endif %}
+
+        {% if perms.subscriptions.pro_perm %}
+            <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            Pro Access
+            </span>
+        {% endif %}
+
+        {% if perms.subscriptions.advanced_perm %}
+            <span class="px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+            Advanced Access
+            </span>
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

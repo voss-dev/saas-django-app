@@ -17,14 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from .views import home_view, about_view, user_only_view, staff_only_view
+from landing.views import landing_page_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("checkout/", include("checkouts.urls")),
     path('accounts/', include('allauth.urls')), #Includes login, signup, password reset, etc.
-    path('', home_view, name='home'),
+    # path('', home_view, name='home'),
     path('about/', about_view),
     path('protected/user/', user_only_view, name='user_only'),
     path('protected/staff/', staff_only_view, name='staff_only'),
+    path('', landing_page_view, name='home'),
 ]
 

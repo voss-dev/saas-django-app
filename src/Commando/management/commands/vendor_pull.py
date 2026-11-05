@@ -8,6 +8,7 @@ VENDOR_STATIC_FILES = {
     "flowbite.min.css": "https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css",
     "flowbite.min.js": "https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js",
     "flowbite.min.js.map": "https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js.map",
+    "sas-theme.min.css": "https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css",
 }
 
 class Command(BaseCommand):
