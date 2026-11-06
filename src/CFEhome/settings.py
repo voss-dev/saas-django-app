@@ -37,7 +37,6 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-# Railway terminates HTTPS at its proxy
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 CSRF_TRUSTED_ORIGINS = ["https://*.onrender.com"]
@@ -202,8 +201,8 @@ MAILERS = {
 
 
 # Optional Admin alert recipients
-ADMINS = [("Admin", "felix.mengesa.dev@gmail.com")]
-MANAGERS = ADMINS
+# ADMINS = [("Admin", "felix.mengesa.dev@gmail.com")]
+# MANAGERS = ADMINS
 
 DATABASE_URL = config("DATABASE_URL", default=None)
 
